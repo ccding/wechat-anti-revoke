@@ -34,7 +34,12 @@ def get_sender_receiver(msg):
         if m is not None:
             receiver = m['NickName']
     elif msg['ToUserName'][0:2] == '@@': # group chat by myself
-        sender = msg['ActualNickName']
+        if 'ActualNickName' in msg:
+            sender = msg['ActualNickName']
+        else:
+            m = itchat.search_friends(userName=msg['FromUserName'])
+            if m is not None:
+                sender = m['NickName']
         m = itchat.search_chatrooms(userName=msg['ToUserName'])
         if m is not None:
             receiver = m['NickName']
