@@ -52,13 +52,11 @@ def print_msg(msg):
 
 def get_whole_msg(msg):
     sender, receiver = get_sender_receiver(msg)
-    c = ''
     if len(msg['FileName']) > 0:
         msg['Text'](msg['FileName'])
         c = '@%s@%s' % (sending_type.get(msg['Type'], 'fil'), msg['FileName'])
         return ['[%s]->[%s]:' % (sender, receiver), c]
-    else:
-        c += msg['Text']
+    c = msg['Text']
     if len(msg['Url']) > 0:
         c += ' ' + msg['Url']
     return ['[%s]->[%s]: %s' % (sender, receiver, c)]
