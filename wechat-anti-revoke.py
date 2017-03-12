@@ -77,7 +77,7 @@ def note_msg(msg):
     if re.search(r'<sysmsg type="revokemsg">', msg['Content']) != None:
         old_msg_id = re.search("\<msgid\>(.*?)\<\/msgid\>", msg['Content']).group(1)
         old_msg = msg_store.get(old_msg_id)
-        if old_msg == None:
+        if old_msg is None:
             return
         msg_send = get_whole_msg(old_msg)
         for m in msg_send:
