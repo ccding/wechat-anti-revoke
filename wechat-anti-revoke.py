@@ -52,7 +52,7 @@ def print_msg(msg):
 
 def get_whole_msg(msg):
     sender, receiver = get_sender_receiver(msg)
-    if len(msg['FileName']) > 0:
+    if len(msg['FileName']) > 0 and len(msg['Url']) == 0:
         msg['Text'](msg['FileName'])
         c = '@%s@%s' % (sending_type.get(msg['Type'], 'fil'), msg['FileName'])
         return ['[%s]->[%s]:' % (sender, receiver), c]
@@ -64,6 +64,7 @@ def get_whole_msg(msg):
 @itchat.msg_register([TEXT, PICTURE, MAP, CARD, SHARING, RECORDING,
     ATTACHMENT, VIDEO, FRIENDS], isFriendChat=True, isGroupChat=True)
 def normal_msg(msg):
+    print_msg(get_whole_msg(msg))
     now = time.time()
     msg['ReceivedTime'] = now
     msg_id = msg['MsgId']
@@ -72,6 +73,7 @@ def normal_msg(msg):
 
 @itchat.msg_register([NOTE], isFriendChat=True, isGroupChat=True)
 def note_msg(msg):
+    print_msg(get_whole_msg(msg))
     if re.search(r'<sysmsg type="revokemsg">', msg['Content']) != None:
         old_msg_id = re.search("\<msgid\>(.*?)\<\/msgid\>", msg['Content']).group(1)
         old_msg = msg_store.get(old_msg_id)
