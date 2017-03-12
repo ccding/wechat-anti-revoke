@@ -23,7 +23,7 @@ def clear_timeouted_message():
         else:
             break
     for i in range(count):
-        item = msg_store.popitem()
+        item = msg_store.popitem(last=False)
 
 def get_sender_receiver(msg):
     sender = None
