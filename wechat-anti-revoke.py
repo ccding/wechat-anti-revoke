@@ -13,6 +13,7 @@ from itchat.content import *
 msg_store = collections.OrderedDict()
 timeout = 600
 sending_type = {'Picture': 'img', 'Video': 'vid'}
+data_path = 'data'
 
 def clear_timeouted_message():
     now = time.time()
@@ -50,11 +51,15 @@ def get_sender_receiver(msg):
 def print_msg(msg):
     print json.dumps(msg).decode('unicode-escape').encode('utf8')
 
-def get_whole_msg(msg):
+def get_whole_msg(msg, download=False):
     sender, receiver = get_sender_receiver(msg)
     if len(msg['FileName']) > 0 and len(msg['Url']) == 0:
-        msg['Text'](msg['FileName'])
-        c = '@%s@%s' % (sending_type.get(msg['Type'], 'fil'), msg['FileName'])
+        if download: # download the file into data_path directory
+            fn = os.path.join(data_path, msg['FileName']
+            msg['Text'](fn)
+            c = '@%s@%s' % (sending_type.get(msg['Type'], 'fil'), fn)
+        else:
+            c = '@%s@%s' % (sending_type.get(msg['Type'], 'fil'), msg['FileName'])
         return ['[%s]->[%s]:' % (sender, receiver), c]
     c = msg['Text']
     if len(msg['Url']) > 0:
@@ -79,11 +84,16 @@ def note_msg(msg):
         old_msg = msg_store.get(old_msg_id)
         if old_msg == None:
             return
-        msg_send = get_whole_msg(old_msg)
+        msg_send = get_whole_msg(old_msg, download=True)
         for m in msg_send:
             itchat.send(m, toUserName='filehelper')
         clear_timeouted_message()
 
 if __name__ == '__main__':
+    if not os.path.exists(data_path):
+        os.mkdir(data_path)
+    # if the QR code doesn't show correctly, you can try to change the value
+    # of enableCdmQR to 1 or -1 or -2. It nothing works, you can change it to
+    # enableCmdQR=True and a picture will show up.
     itchat.auto_login(hotReload=True, enableCmdQR=2)
     itchat.run()
