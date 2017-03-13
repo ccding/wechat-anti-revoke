@@ -90,3 +90,5 @@ ENV/
 
 # itchat tmp file
 itchat.pkl
+# data file
+data
