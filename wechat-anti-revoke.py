@@ -7,6 +7,9 @@ sys.setdefaultencoding('UTF8')
 
 import os, re, shutil, time, collections, json
 
+from HTMLParser import HTMLParser
+from xml.etree import ElementTree as ETree
+
 import itchat
 from itchat.content import *
 
@@ -84,8 +87,10 @@ def normal_msg(msg):
 @itchat.msg_register([NOTE], isFriendChat=True, isGroupChat=True)
 def note_msg(msg):
     print_msg(get_whole_msg(msg))
-    if re.search(r'<sysmsg type="revokemsg">', msg['Content']) != None:
-        old_msg_id = re.search("\<msgid\>(.*?)\<\/msgid\>", msg['Content']).group(1)
+    content = HTMLParser().unescape(msg['Content'])
+    revoked = ETree.fromstring(content).find('revokemsg')
+    if revoked is not None:
+        old_msg_id = revoked.find('msgid').text
         old_msg = msg_store.get(old_msg_id)
         if old_msg is None:
             return
