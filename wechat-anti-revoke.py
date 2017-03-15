@@ -75,7 +75,8 @@ def get_whole_msg(msg, download=False):
         return ['[%s]->[%s]:' % (sender, receiver), c]
     c = msg['Text']
     if len(msg['Url']) > 0:
-        c += ' ' + msg['Url']
+        url = HTMLParser().unescape(msg['Url'])
+        c += ' ' + url
     return ['[%s]->[%s]: %s' % (sender, receiver, c)]
 
 @itchat.msg_register([TEXT, PICTURE, MAP, CARD, SHARING, RECORDING,
