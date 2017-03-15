@@ -17,6 +17,18 @@ msg_store = collections.OrderedDict()
 timeout = 600
 sending_type = {'Picture': 'img', 'Video': 'vid'}
 data_path = 'data'
+nick_name = ''
+bot = None
+
+if __name__ == '__main__':
+    if not os.path.exists(data_path):
+        os.mkdir(data_path)
+    # if the QR code doesn't show correctly, you can try to change the value
+    # of enableCdmQR to 1 or -1 or -2. It nothing works, you can change it to
+    # enableCmdQR=True and a picture will show up.
+    bot = itchat.new_instance()
+    bot.auto_login(hotReload=True, enableCmdQR=2)
+    nick_name = bot.loginInfo['User']['NickName']
 
 def clear_timeouted_message():
     now = time.time()
@@ -30,31 +42,31 @@ def clear_timeouted_message():
         item = msg_store.popitem(last=False)
 
 def get_sender_receiver(msg):
-    sender = None
-    receiver = None
+    sender = nick_name
+    receiver = nick_name
     if msg['FromUserName'][0:2] == '@@': # group chat
         sender = msg['ActualNickName']
-        m = itchat.search_chatrooms(userName=msg['FromUserName'])
+        m = bot.search_chatrooms(userName=msg['FromUserName'])
         if m is not None:
             receiver = m['NickName']
     elif msg['ToUserName'][0:2] == '@@': # group chat by myself
         if 'ActualNickName' in msg:
             sender = msg['ActualNickName']
         else:
-            m = itchat.search_friends(userName=msg['FromUserName'])
+            m = bot.search_friends(userName=msg['FromUserName'])
             if m is not None:
                 sender = m['NickName']
-        m = itchat.search_chatrooms(userName=msg['ToUserName'])
+        m = bot.search_chatrooms(userName=msg['ToUserName'])
         if m is not None:
             receiver = m['NickName']
     else: # personal chat
-        m = itchat.search_friends(userName=msg['FromUserName'])
+        m = bot.search_friends(userName=msg['FromUserName'])
         if m is not None:
             sender = m['NickName']
-        m = itchat.search_friends(userName=msg['ToUserName'])
+        m = bot.search_friends(userName=msg['ToUserName'])
         if m is not None:
             receiver = m['NickName']
-    return sender, receiver
+    return HTMLParser().unescape(sender), HTMLParser().unescape(receiver)
 
 def print_msg(msg):
     if len(msg) == 0:
@@ -88,7 +100,7 @@ def get_whole_msg(msg, download=False):
         c += ' ' + url
     return ['[%s]->[%s]: %s' % (sender, receiver, c)]
 
-@itchat.msg_register([TEXT, PICTURE, MAP, CARD, SHARING, RECORDING,
+@bot.msg_register([TEXT, PICTURE, MAP, CARD, SHARING, RECORDING,
     ATTACHMENT, VIDEO, FRIENDS], isFriendChat=True, isGroupChat=True)
 def normal_msg(msg):
     print_msg(get_whole_msg(msg))
@@ -98,7 +110,7 @@ def normal_msg(msg):
     msg_store[msg_id] = msg
     clear_timeouted_message()
 
-@itchat.msg_register([NOTE], isFriendChat=True, isGroupChat=True)
+@bot.msg_register([NOTE], isFriendChat=True, isGroupChat=True)
 def note_msg(msg):
     print_msg(get_whole_msg(msg))
     content = HTMLParser().unescape(msg['Content'])
@@ -114,14 +126,8 @@ def note_msg(msg):
         return
     msg_send = get_whole_msg(old_msg, download=True)
     for m in msg_send:
-        itchat.send(m, toUserName='filehelper')
+        bot.send(m, toUserName='filehelper')
     clear_timeouted_message()
 
 if __name__ == '__main__':
-    if not os.path.exists(data_path):
-        os.mkdir(data_path)
-    # if the QR code doesn't show correctly, you can try to change the value
-    # of enableCdmQR to 1 or -1 or -2. It nothing works, you can change it to
-    # enableCmdQR=True and a picture will show up.
-    itchat.auto_login(hotReload=True, enableCmdQR=2)
-    itchat.run()
+    bot.run()
