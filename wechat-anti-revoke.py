@@ -75,6 +75,9 @@ def get_whole_msg(msg, download=False):
         return ['[%s]->[%s]:' % (sender, receiver), c]
     c = msg['Text']
     if len(msg['Url']) > 0:
+        map_label = ETree.fromstring(msg['OriContent']).find('location')
+        if map_label is not None:
+            c += ' ' + map_label.attrib['label']
         url = HTMLParser().unescape(msg['Url'])
         c += ' ' + url
     return ['[%s]->[%s]: %s' % (sender, receiver, c)]
@@ -93,16 +96,20 @@ def normal_msg(msg):
 def note_msg(msg):
     print_msg(get_whole_msg(msg))
     content = HTMLParser().unescape(msg['Content'])
-    revoked = ETree.fromstring(content).find('revokemsg')
-    if revoked is not None:
-        old_msg_id = revoked.find('msgid').text
-        old_msg = msg_store.get(old_msg_id)
-        if old_msg is None:
-            return
-        msg_send = get_whole_msg(old_msg, download=True)
-        for m in msg_send:
-            itchat.send(m, toUserName='filehelper')
-        clear_timeouted_message()
+    content_tree = ETree.fromstring(content)
+    if content_tree is None:
+        return
+    revoked = content_tree.find('revokemsg')
+    if revoked is None:
+        return
+    old_msg_id = revoked.find('msgid').text
+    old_msg = msg_store.get(old_msg_id)
+    if old_msg is None:
+        return
+    msg_send = get_whole_msg(old_msg, download=True)
+    for m in msg_send:
+        itchat.send(m, toUserName='filehelper')
+    clear_timeouted_message()
 
 if __name__ == '__main__':
     if not os.path.exists(data_path):
