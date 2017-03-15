@@ -80,6 +80,7 @@ def get_whole_msg(msg, download=False):
             if content_tree is not None:
                 map_label = content_tree.find('location')
                 if map_label is not None:
+                    c += ' ' + map_label.attrib['poiname']
                     c += ' ' + map_label.attrib['label']
         except:
             pass
