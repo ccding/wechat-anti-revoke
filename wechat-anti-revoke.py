@@ -77,7 +77,7 @@ def get_whole_msg(msg, download=False):
     if len(msg['Url']) > 0:
         try: # handle map label
             content_tree = ETree.fromstring(msg['OriContent'])
-            if content_tree is not Nond:
+            if content_tree is not None:
                 map_label = content_tree.find('location')
                 if map_label is not None:
                     c += ' ' + map_label.attrib['label']
