@@ -17,7 +17,7 @@ msg_store = collections.OrderedDict()
 timeout = 600
 sending_type = {'Picture': 'img', 'Video': 'vid'}
 data_path = 'data'
-nick_name = ''
+nickname = ''
 bot = None
 
 if __name__ == '__main__':
@@ -28,7 +28,7 @@ if __name__ == '__main__':
     # enableCmdQR=True and a picture will show up.
     bot = itchat.new_instance()
     bot.auto_login(hotReload=True, enableCmdQR=2)
-    nick_name = bot.loginInfo['User']['NickName']
+    nickname = bot.loginInfo['User']['NickName']
 
 def clear_timeouted_message():
     now = time.time()
@@ -42,8 +42,8 @@ def clear_timeouted_message():
         item = msg_store.popitem(last=False)
 
 def get_sender_receiver(msg):
-    sender = nick_name
-    receiver = nick_name
+    sender = nickname
+    receiver = nickname
     if msg['FromUserName'][0:2] == '@@': # group chat
         sender = msg['ActualNickName']
         m = bot.search_chatrooms(userName=msg['FromUserName'])
