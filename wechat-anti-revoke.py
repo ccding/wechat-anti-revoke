@@ -79,6 +79,8 @@ def get_whole_msg(msg, download=False):
         if download: # download the file into data_path directory
             fn = os.path.join(data_path, msg['FileName'])
             msg['Text'](fn)
+            if os.path.getsize(fn) == 0:
+                return []
             c = '@%s@%s' % (sending_type.get(msg['Type'], 'fil'), fn)
         else:
             c = '@%s@%s' % (sending_type.get(msg['Type'], 'fil'), msg['FileName'])
