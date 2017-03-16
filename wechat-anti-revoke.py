@@ -69,9 +69,9 @@ def get_sender_receiver(msg):
     return HTMLParser().unescape(sender), HTMLParser().unescape(receiver)
 
 def print_msg(msg):
-    if len(msg) == 0:
-        return
-    print json.dumps(msg).decode('unicode-escape').encode('utf8')
+    msg_str = ' '.join(msg)
+    print msg_str
+    return msg_str
 
 def get_whole_msg(msg, download=False):
     sender, receiver = get_sender_receiver(msg)
