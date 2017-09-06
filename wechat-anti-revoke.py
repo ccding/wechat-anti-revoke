@@ -114,7 +114,11 @@ def normal_msg(msg):
 def note_msg(msg):
     print_msg(get_whole_msg(msg))
     content = HTMLParser().unescape(msg['Content'])
-    content_tree = ETree.fromstring(content)
+    try:
+        content_tree = ETree.fromstring(content)
+    except Exception:
+        # invent/remove to chatroom
+        return
     if content_tree is None:
         return
     revoked = content_tree.find('revokemsg')
